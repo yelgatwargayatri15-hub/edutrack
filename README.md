@@ -1,0 +1,2 @@
+# edutrack
+Student Management System
