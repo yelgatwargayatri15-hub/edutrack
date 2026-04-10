@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Co-operative Banking System</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      text-align: center;
+    }
+
+    h1 {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px;
+      border-radius: 5px;
+      border: 1px solid gray;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .login-btn { background: #3498db; }
+    .deposit-btn { background: green; }
+    .withdraw-btn { background: red; }
+
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 95%;
+    }
+
+    th {
+      background: #2c3e50;
+      color: white;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1>🏦 Co-operative Banking System</h1>
+
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+  <h3>Login</h3>
+  <input type="text" id="username" placeholder="Enter Name"><br>
+  <input type="password" id="password" placeholder="Enter Password"><br>
+  <button class="login-btn" onclick="login()">Login</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="box" id="dashboard" style="display:none;">
+  <h3>Welcome, <span id="user"></span></h3>
+
+  <p><b>Date:</b> <span id="date"></span></p>
+  <p><b>Balance:</b> ₹<span id="balance"></span></p>
+
+  <input type="number" id="amount" placeholder="Enter Amount"><br>
+
+  <button class="deposit-btn" onclick="deposit()">Deposit</button>
+  <button class="withdraw-btn" onclick="withdraw()">Withdraw</button>
+
+  <h3>Transaction History</h3>
+
+  <table>
+    <tr>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Date</th>
+    </tr>
+    <tbody id="history"></tbody>
+  </table>
+</div>
+
+<script>
+let balance = localStorage.getItem("balance") ? parseInt(localStorage.getItem("balance")) : 5000;
+let history = JSON.parse(localStorage.getItem("history")) || [];
+
+document.getElementById("date").innerHTML = new Date().toLocaleDateString();
+
+function login(){
+  let name = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  if(name === "" || pass === ""){
+    alert("Enter login details");
+    return;
+  }
+
+  document.getElementById("user").innerHTML = name;
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+
+  updateUI();
+}
+
+function updateUI(){
+  document.getElementById("balance").innerHTML = balance;
+
+  let table = document.getElementById("history");
+  table.innerHTML = "";
+
+  history.forEach(item => {
+    let row = table.insertRow();
+    row.insertCell(0).innerHTML = item.type;
+    row.insertCell(1).innerHTML = item.amount;
+    row.insertCell(2).innerHTML = item.date;
+  });
+
+  localStorage.setItem("balance", balance);
+  localStorage.setItem("history", JSON.stringify(history));
+}
+
+function deposit(){
+  let amount = parseInt(document.getElementById("amount").value);
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  balance += amount;
+
+  history.push({
+    type: "Deposit",
+    amount: amount,
+    date: new Date().toLocaleDateString()
+  });
+
+  updateUI();
+}
+
+function withdraw(){
+  let amount = parseInt(document.getElementById("amount").value);
+
+  if(!amount || amount <= 0){
+    alert("Enter valid amount");
+    return;
+  }
+
+  if(amount > balance){
+    alert("Insufficient balance");
+    return;
+  }
+
+  balance -= amount;
+
+  history.push({
+    type: "Withdraw",
+    amount: amount,
+    date: new Date().toLocaleDateString()
+  });
+
+  updateUI();
+}
+</script>
+
+</body>
+</html>
